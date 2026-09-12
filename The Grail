@@ -1,0 +1,51 @@
+def __init__(self, initial_supply: float, hook_rate: float):
+        self.initial_supply = initial_supply
+        self.circulating_supply = initial_supply
+        self.hook_rate = hook_rate
+        self.total_burned = 0.0
+        self.burn_pool = 0.0
+
+    def process_transaction(self, amount: float):
+        """Simulates a trade, intercepts the fee, and burns it."""
+        # 1. Hook Interception
+        intercepted_fee = amount * self.hook_rate
+
+        # 2. Automated Burn Pool Aggregation
+        self.burn_pool += intercepted_fee
+
+        # 3. The "Burn" Event (Moved to Dead Address)
+        burned_amount = self.burn_pool
+        self.total_burned += burned_amount
+        self.burn_pool = 0.0  # Clear the pool
+
+        # 4. Total Supply Contracted
+        self.circulating_supply -= burned_amount
+
+        # Calculate Scarcity Metric (Relative weight of a fixed 10,000 token bag)
+        scarcity_index = (self.initial_supply / self.circulating_supply) * 100
+
+        return {
+            "Tx_Volume": amount,
+            "Intercepted_Fee": intercepted_fee,
+            "Total_Burned": self.total_burned,
+            "Circulating_Supply": self.circulating_supply,
+            "Scarcity_Index_Pct": scarcity_index,
+        }
+
+
+# --- RUN SIMULATION ---
+# Initialize with 1,000,000 tokens and a 2% automated hook rate
+sim = TokenomicsSimulator(initial_supply=1_000_000, hook_rate=0.02)
+
+# Simulated sequence of market transaction volumes
+tx_volumes = [50000, 75000, 120000, 45000, 90000]
+log_data = []
+
+for volume in tx_volumes:
+    metrics = sim.process_transaction(volume)
+    log_data.append(metrics)
+
+# Display as a clean DataFrame table
+df = pd.DataFrame(log_data)
+print(df.to_string(index=False))
+

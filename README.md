@@ -47,3 +47,4 @@ class MassiveTokenomicsSim:
         self.burn_pool = 0
         return burned_amount
 
+<img width="1024" height="559" alt="image_a035d160-4069-4fcf-a618-9371bc5c9a52" src="https://github.com/user-attachments/assets/28f7028c-ab11-42a5-b845-4eafc4b28292" />
